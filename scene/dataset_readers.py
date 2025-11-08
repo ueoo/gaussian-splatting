@@ -56,7 +56,7 @@ class SceneInfo(NamedTuple):
     test_cameras: list
     nerf_normalization: dict
     ply_path: str
-    bbox_model: BBoxTool  # only used in hyfluid
+    bbox_model: BBoxTool = None  # only used in hyfluid
 
 
 def getNerfppNorm(cam_info):
@@ -227,12 +227,15 @@ def readCamerasFromTransforms(path, transformsfile, white_background, extension=
 
     with open(os.path.join(path, transformsfile)) as json_file:
         contents = json.load(json_file)
-        fovx = contents["camera_angle_x"]
+        fovx = contents["camera_angle_x"] if "camera_angle_x" in contents else None
 
         frames = contents["frames"]
         for idx, frame in enumerate(frames):
             cam_name = os.path.join(path, frame["file_path"] + extension)
 
+            if fovx is None:
+                assert "camera_angle_x" in frame, "camera_angle_x not found in frame"
+                fovx = frame["camera_angle_x"]
             # NeRF 'transform_matrix' is a camera-to-world transform
             c2w = np.array(frame["transform_matrix"])
             # change from OpenGL/Blender camera axes (Y up, Z back) to COLMAP (Y down, Z forward)
@@ -399,7 +402,7 @@ def readNerfSyntheticInfoHyFluid(path, white_background, eval, extension=".png",
     # if not os.path.exists(ply_path):
     # Since this data set has no colmap data, we start with random points
     # hyfluid recreate the points every time
-    num_pts = 1  # 100_000
+    num_pts = 100_000
     print(f"Generating random point cloud ({num_pts})...")
 
     # We create random points inside the bounds of the synthetic Blender scenes

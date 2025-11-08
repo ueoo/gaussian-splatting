@@ -15,7 +15,6 @@ import numpy as np
 import torch
 
 from plyfile import PlyData, PlyElement
-from simple_knn._C import distCUDA2
 from torch import nn
 
 from utils.general_utils import (
@@ -143,7 +142,7 @@ class GaussianModel:
 
         # dist2 = torch.clamp_min(distCUDA2(torch.from_numpy(np.asarray(pcd.points)).float().cuda()), 0.0000001)
         # scales = torch.log(torch.sqrt(dist2))[..., None].repeat(1, 3)
-        scales = torch.zeros((fused_point_cloud.shape[0], 3), device="cuda") - 4.0 # 6.2
+        scales = torch.zeros((fused_point_cloud.shape[0], 3), device="cuda") - 4.0  # 6.2
         rots = torch.zeros((fused_point_cloud.shape[0], 4), device="cuda")
         rots[:, 0] = 1
 
@@ -207,8 +206,6 @@ class GaussianModel:
         mkdir_p(os.path.dirname(path))
 
         xyz = self._xyz.detach().cpu().numpy()
-
-        # xyz[:, 1:3] *= -1  # convert COLMAP to OpenGL
 
         normals = np.zeros_like(xyz)
         f_dc = self._features_dc.detach().transpose(1, 2).flatten(start_dim=1).contiguous().cpu().numpy()
