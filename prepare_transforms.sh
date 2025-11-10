@@ -2,8 +2,8 @@
 set -euo pipefail
 
 data_root="/svl/u/yuegao/NeuROK/PhysDreamer/phys_dreamer/data_NeuROK_sim"
-# all_names=(bow box cloth flower newton)
-all_names=(cloth)
+# all_names=(bow box cloth flower newton shirt lamp)
+all_names=(laptop)
 
 
 # "${1:?Usage: $0 DATASET_DIR}"
